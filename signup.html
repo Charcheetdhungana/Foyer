@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign up — Foyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container">
+    <a class="logo" href="index.html">
+      <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4DD6C1"/><stop offset="100%" stop-color="#5B7CFA"/>
+        </linearGradient></defs>
+        <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+        <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+      </svg>
+      Foyer
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <div class="nav-item"><a href="index.html">Home</a></div>
+      <div class="nav-item"><a href="index.html#events">Events</a></div>
+      <div class="nav-item"><a href="team.html">Team</a></div>
+      <div class="nav-item"><a class="nav-cta" href="login.html">Log in</a></div>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="auth">
+
+    <h1>Create your account</h1>
+    <p class="muted small" id="subtitle">Your first event on Foyer is free.</p>
+
+    <form id="signupForm" style="margin-top:24px" novalidate>
+
+      <span class="legend">I am signing up as</span>
+      <div class="role-group">
+        <label class="role">
+          <input type="radio" name="role" value="business" checked>
+          <span><b>Business</b><span>I want to create and run my own events</span></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="role" value="personal">
+          <span><b>Personal</b><span>I want to register for events and keep my tickets</span></span>
+        </label>
+      </div>
+
+      <div id="clientFields">
+        <div class="field">
+          <label for="business">Business name</label>
+          <input id="business" name="business_name" type="text" autocomplete="organization" required>
+        </div>
+        <div class="field">
+          <label for="cEmail">Email address</label>
+          <input id="cEmail" name="email" type="email" autocomplete="email" required>
+          <p class="hint">Used for your account and event notifications.</p>
+        </div>
+        <div class="field">
+          <label for="contact">Contact number</label>
+          <input id="contact" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="04XX XXX XXX" required>
+        </div>
+      </div>
+
+      <div id="attendeeFields" class="hide">
+        <div class="row2">
+          <div class="field">
+            <label for="first">First name</label>
+            <input id="first" name="first_name" type="text" autocomplete="given-name" required disabled>
+          </div>
+          <div class="field">
+            <label for="last">Last name</label>
+            <input id="last" name="last_name" type="text" autocomplete="family-name" required disabled>
+          </div>
+        </div>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="04XX XXX XXX" required disabled>
+        </div>
+        <div class="field">
+          <label for="aEmail">Email address</label>
+          <input id="aEmail" name="email" type="email" autocomplete="email" required disabled>
+          <p class="hint">Tickets and event updates are sent here.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+        <p class="hint">At least 8 characters.</p>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Create account</button>
+
+      <div class="divider">Already registered?</div>
+      <a class="btn" id="loginLink" href="login.html">Log in instead</a>
+
+      <div id="message" class="msg"></div>
+
+    </form>
+  </div>
+</div>
+
+<footer class="foot-lux">
+  <div class="container">
+    <div class="made">
+      <span>Designed and built by <a class="inline" href="team.html"><b>Team Foyer</b></a> — Sydney, Australia</span>
+      <span>© <span data-year>2026</span> Foyer</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+
+var clientFields   = document.getElementById('clientFields');
+var attendeeFields = document.getElementById('attendeeFields');
+
+/* Show the right fields, and switch off the hidden ones so they are not
+   validated or sent to the server. */
+var SUBTITLES = {
+  business: 'Your first event on Foyer is free.',
+  personal: 'Free for attendees. Your tickets and event history stay in one place.'
+};
+
+function showFieldsFor(role) {
+  var client = (role === 'business');
+  document.getElementById('subtitle').textContent = SUBTITLES[role];
+  clientFields.classList.toggle('hide', !client);
+  attendeeFields.classList.toggle('hide', client);
+  clientFields.querySelectorAll('input').forEach(function (i) { i.disabled = !client; });
+  attendeeFields.querySelectorAll('input').forEach(function (i) { i.disabled = client; });
+}
+
+document.querySelectorAll('input[name="role"]').forEach(function (radio) {
+  radio.addEventListener('change', function () { showFieldsFor(this.value); });
+});
+
+var params = new URLSearchParams(location.search);
+var next = params.get('next');
+var message = document.getElementById('message');
+
+function selectedRole() { return document.querySelector('input[name="role"]:checked').value; }
+
+if (params.get('role') === 'personal' || params.get('role') === 'business') {
+  document.querySelector('input[name="role"][value="' + params.get('role') + '"]').checked = true;
+}
+showFieldsFor(selectedRole());
+
+document.querySelectorAll('input[name="role"]').forEach(function (r) {
+  r.addEventListener('change', function () {
+    document.getElementById('loginLink').href = 'login.html?role=' + selectedRole() + (next ? '&next=' + encodeURIComponent(next) : '');
+  });
+});
+
+document.getElementById('signupForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  message.className = 'msg';
+  message.textContent = '';
+
+  /* Hidden fields are disabled, so this only checks the visible ones. */
+  var bad = Array.prototype.filter.call(this.querySelectorAll('input:not([disabled])'), function (i) {
+    return !i.checkValidity();
+  })[0];
+  if (bad) {
+    message.className = 'msg msg-err';
+    message.textContent = (bad.labels[0] ? bad.labels[0].textContent : 'A field') + ': ' + bad.validationMessage;
+    bad.focus();
+    return;
+  }
+
+  var role = selectedRole();
+  var data = { role: role, password: this.password.value };
+  if (role === 'business') {
+    data.businessName = this.querySelector('#business').value.trim();
+    data.email = this.querySelector('#cEmail').value;
+    data.phone = this.querySelector('#contact').value;
+  } else {
+    data.firstName = this.querySelector('#first').value.trim();
+    data.lastName = this.querySelector('#last').value.trim();
+    data.email = this.querySelector('#aEmail').value;
+    data.phone = this.querySelector('#phone').value;
+  }
+
+  Foyer.signup(data).then(function (user) {
+    location.href = next ? Foyer.afterLogin(user, next) : Foyer.homeFor(user) + '#welcome';
+  }).catch(function (err) {
+    message.className = 'msg msg-err';
+    message.textContent = err.message;
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — Foyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container">
+    <a class="logo" href="index.html">
+      <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4DD6C1"/><stop offset="100%" stop-color="#5B7CFA"/>
+        </linearGradient></defs>
+        <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+        <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+      </svg>
+      Foyer
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <div class="nav-item"><a href="index.html">Home</a></div>
+      <div class="nav-item"><a href="index.html#events">Events</a></div>
+      <div class="nav-item"><a href="team.html">Team</a></div>
+      <div class="nav-item"><a class="nav-cta" href="signup.html">Sign up</a></div>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="auth">
+
+    <div class="msg msg-ok hide" id="reasonNote">Log in to get your ticket. New here? <a id="reasonSignup" href="signup.html?role=personal">Create a free personal account</a> — it takes a minute.</div>
+
+    <h1>Log in</h1>
+    <p class="muted small">Choose how you are using Foyer today.</p>
+
+    <form id="loginForm" style="margin-top:24px" novalidate>
+
+      <span class="legend">I am logging in as</span>
+      <div class="role-group">
+        <label class="role">
+          <input type="radio" name="role" value="business" checked>
+          <span><b>Business</b><span>I run events and want to create or manage them</span></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="role" value="personal">
+          <span><b>Personal</b><span>I am going to an event and want my ticket</span></span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <p class="hint"><a href="#" id="forgot">Forgot your password?</a></p>
+        <p class="hint hide" id="forgotNote">Password reset by email arrives with our server. Until then,
+          <a href="index.html#contact">contact us</a> and we will reset it for you.</p>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Log in</button>
+
+      <div class="divider">Don't have an account?</div>
+      <a class="btn" id="signupLink" href="signup.html">Sign up here</a>
+
+      <div id="message" class="msg"></div>
+
+    </form>
+
+  </div>
+</div>
+
+<footer class="foot-lux">
+  <div class="container">
+    <div class="made">
+      <span>Designed and built by <a class="inline" href="team.html"><b>Team Foyer</b></a> — Sydney, Australia</span>
+      <span>© <span data-year>2026</span> Foyer</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+
+var params = new URLSearchParams(location.search);
+var next = params.get('next');
+var message = document.getElementById('message');
+
+if (params.get('reason') === 'ticket') {
+  document.getElementById('reasonNote').classList.remove('hide');
+  document.getElementById('reasonSignup').href = 'signup.html?role=personal' + (next ? '&next=' + encodeURIComponent(next) : '');
+}
+
+document.getElementById('forgot').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('forgotNote').classList.toggle('hide');
+});
+
+/* Already logged in? Go straight to your account. */
+Foyer.ready.then(function () {
+  var u = Foyer.currentUser();
+  if (u && !params.get('reason')) location.replace(Foyer.afterLogin(u, next));
+});
+
+function selectedRole() { return document.querySelector('input[name="role"]:checked').value; }
+
+if (params.get('role') === 'personal' || params.get('role') === 'business') {
+  document.querySelector('input[name="role"][value="' + params.get('role') + '"]').checked = true;
+}
+
+/* Keep the sign-up link on the same account type. */
+function syncSignupLink() {
+  document.getElementById('signupLink').href = 'signup.html?role=' + selectedRole() + (next ? '&next=' + encodeURIComponent(next) : '');
+}
+document.querySelectorAll('input[name="role"]').forEach(function (r) { r.addEventListener('change', syncSignupLink); });
+syncSignupLink();
+
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var role = selectedRole();
+  message.className = 'msg';
+  message.textContent = '';
+  Foyer.login(this.email.value, this.password.value, role).then(function (user) {
+    location.href = Foyer.afterLogin(user, next);
+  }).catch(function (err) {
+    message.className = 'msg msg-err';
+    message.textContent = err.message;
+  });
+});
+</script>
+
+</body>
+</html>

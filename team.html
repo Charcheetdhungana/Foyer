@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Foyer — the people behind Foyer</title>
+<meta name="description" content="Meet Team Foyer: Charchit Dhungana, Prithvi Shrestha and Abiral Tiwari, building Foyer in Sydney.">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container">
+    <a class="logo" href="index.html">
+      <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4DD6C1"/><stop offset="100%" stop-color="#5B7CFA"/>
+        </linearGradient></defs>
+        <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+        <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+      </svg>
+      Foyer
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <div class="nav-item"><a href="index.html">Home</a></div>
+      <div class="nav-item"><a href="index.html#events">Events</a></div>
+      <div class="nav-item"><a href="team.html">Team</a></div>
+      <div class="nav-item" id="navLogin"><a href="login.html">Log in</a></div>
+      <div class="nav-item" id="navCta"><a class="nav-cta" href="signup.html">Sign up</a></div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero team-hero">
+  <div class="aurora">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+  <div class="container">
+    <p class="eyebrow rise d1">Team Foyer</p>
+    <h1 class="rise d1">The people behind <span class="shine">Foyer</span></h1>
+    <p class="rise d2">We built Foyer because organising an event is far more complicated than it should be.
+       Our answer is a single platform where you can plan, manage and run every part of your event.</p>
+  </div>
+</section>
+
+<section class="section band-light">
+  <div class="container">
+    <div class="members">
+
+      <article class="member reveal">
+        <div class="photo p1"><img src="images/team/charchit.jpg" alt="Charchit Dhungana" onerror="this.remove()">CD</div>
+        <div>
+          <h2>Charchit Dhungana</h2>
+          <p class="member-role">Founder · Front end and security</p>
+          <p>Charchit founded Foyer and leads its product vision, design and security. With a strong
+             focus on user experience, Charchit makes sure Foyer is simple to use for organisers and
+             attendees alike, while keeping every account and personal detail secure.</p>
+        </div>
+      </article>
+
+      <article class="member reveal">
+        <div class="photo p2"><img src="images/team/prithvi.jpg" alt="Prithvi Shrestha" onerror="this.remove()">PS</div>
+        <div>
+          <h2>Prithvi Shrestha</h2>
+          <p class="member-role">Database and back end</p>
+          <p>Prithvi leads Foyer's data and back-end systems. Prithvi builds the reliable foundation
+             behind the platform, making sure every booking, ticket and check-in is recorded
+             accurately and available the moment it is needed.</p>
+        </div>
+      </article>
+
+      <article class="member reveal">
+        <div class="photo p3"><img src="images/team/abiral.jpg" alt="Abiral Tiwari" onerror="this.remove()">AT</div>
+        <div>
+          <h2>Abiral Tiwari</h2>
+          <p class="member-role">Testing and documentation</p>
+          <p>Abiral leads quality assurance and documentation. Abiral tests every feature on desktop
+             and mobile so Foyer performs exactly as promised, and keeps clear documentation that
+             helps the platform grow with confidence.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="section band-light" style="padding-top:0">
+  <div class="container">
+    <h2 class="reveal">How we built Foyer</h2>
+    <p class="muted reveal">Four steps, repeated until it felt right.</p>
+    <div class="steps">
+      <div class="card reveal"><div class="ico">01</div><h3>Research</h3>
+        <p>We studied more than 50 event platforms to see where organisers and attendees get stuck.</p></div>
+      <div class="card reveal"><div class="ico">02</div><h3>Design</h3>
+        <p>We designed two separate experiences: one for businesses running events, one for people going to them.</p></div>
+      <div class="card reveal"><div class="ico">03</div><h3>Build</h3>
+        <p>Event pages, tickets with QR codes, check-in and profiles — all sharing one record per attendee.</p></div>
+      <div class="card reveal"><div class="ico">04</div><h3>Test</h3>
+        <p>We walked through every page as a first-time visitor on desktop and phone, and fixed what confused us.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="join">
+  <div class="container">
+    <h2 class="reveal">Want to see it working?</h2>
+    <p class="muted reveal" style="max-width:52ch">Browse the upcoming events, or create a free business account and publish your first event at no cost.</p>
+    <div class="actions reveal">
+      <a class="btn btn-primary btn-inline" href="index.html#events">Browse events</a>
+      <a class="btn btn-inline" href="index.html#contact">Contact Team Foyer</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot-lux">
+  <div class="container">
+    <div class="made">
+      <span>Designed and built by <a class="inline" href="team.html"><b>Team Foyer</b></a> — Sydney, Australia</span>
+      <span>© <span data-year>2026</span> Foyer</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry, i) {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i * 90) + 'ms';
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+</script>
+
+</body>
+</html>

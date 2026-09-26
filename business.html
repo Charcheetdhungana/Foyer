@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business portal — Foyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="portal">
+
+  <aside class="side">
+    <div class="who">
+      <div class="avatar" id="avatar"></div>
+      <div>
+        <b id="whoName"></b>
+        <span>Business account</span>
+      </div>
+      <button class="menu-btn" type="button" aria-expanded="false">Menu</button>
+    </div>
+
+    <h4>Events</h4>
+    <button class="nav" data-view="dashboard">Dashboard</button>
+    <button class="nav" data-view="events">My events <span class="count" id="countEvents"></span></button>
+    <button class="nav" data-view="create">Create event</button>
+    <button class="nav" data-view="attendees">Attendees</button>
+    <button class="nav" data-view="checkin">Check-in</button>
+
+    <h4>Account</h4>
+    <button class="nav" data-view="settings">Settings</button>
+    <a href="index.html">View public site</a>
+    <a href="#" id="logout">Log out</a>
+  </aside>
+
+  <main class="main">
+
+    <!-- Dashboard -->
+    <section class="view" id="view-dashboard">
+      <div class="top-row">
+        <div>
+          <h2 id="welcome"></h2>
+          <p class="muted small">Here is what is happening across your events.</p>
+        </div>
+        <button class="btn btn-primary btn-inline" data-go="create">Create event</button>
+      </div>
+
+      <div class="banner" id="billing"></div>
+
+      <div class="cards" id="stats"></div>
+
+      <div class="split">
+        <div class="panel" id="nextUp"></div>
+        <div class="panel">
+          <h3>Latest registrations</h3>
+          <ul class="list" id="latest"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- My events -->
+    <section class="view" id="view-events">
+      <div class="top-row">
+        <div>
+          <h2>My events</h2>
+          <p class="muted small">Drafts are only visible to you. Published events appear on the public site.</p>
+        </div>
+        <button class="btn btn-primary btn-inline" data-go="create">Create event</button>
+      </div>
+      <div class="tbl-wrap" style="margin-top:22px" id="eventsTable"></div>
+    </section>
+
+    <!-- Create / edit event -->
+    <section class="view" id="view-create">
+      <h2 id="formTitle">Create an event</h2>
+      <p class="muted small">Fill in the basics now. You can save a draft and publish later.</p>
+
+      <form id="eventForm" class="panel" style="margin-top:22px" novalidate>
+        <input type="hidden" name="id">
+
+        <h3>The event</h3>
+        <div class="field">
+          <label for="fTitle">Event name</label>
+          <input id="fTitle" name="title" type="text" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="fDesc">What is it about?</label>
+          <textarea id="fDesc" name="description" maxlength="1000" required></textarea>
+          <p class="hint">Shown on the event card. One or two sentences works best.</p>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="fDate">Date</label>
+            <input id="fDate" name="date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="fTime">Start time</label>
+            <input id="fTime" name="time" type="time" required>
+          </div>
+        </div>
+
+        <h3 style="margin-top:10px">Venue</h3>
+        <div class="field">
+          <label for="fVenue">Venue</label>
+          <input id="fVenue" name="venue" type="text" list="venueList" required>
+          <datalist id="venueList">
+
+          </datalist>
+          <p class="hint">Pick one of ours or type your own.</p>
+          <div class="venue-preview hide" id="venuePreview"></div>
+        </div>
+        <div class="field">
+          <label for="fRoom">Room or area</label>
+          <input id="fRoom" name="room" type="text" placeholder="e.g. Level 3, Room 3.02" required>
+          <p class="hint">Attendees see this on their ticket so they go to the right room.</p>
+        </div>
+
+        <h3 style="margin-top:10px">Tickets and catering</h3>
+        <div class="row3">
+          <div class="field">
+            <label for="fCap">Seats</label>
+            <input id="fCap" name="capacity" type="number" min="1" max="10000" required>
+          </div>
+          <div class="field">
+            <label for="fPrice">Ticket price ($)</label>
+            <input id="fPrice" name="price" type="number" min="0" step="0.01" value="0" required>
+            <p class="hint">0 means free.</p>
+          </div>
+          <div class="field">
+            <label for="fCatPrice">Catering per head ($)</label>
+            <input id="fCatPrice" name="cateringPrice" type="number" min="0" step="0.01" value="0">
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" name="catering" id="fCatering"> Food and drink will be provided</label>
+
+        <h3 style="margin-top:10px">After the event</h3>
+        <div class="field">
+          <label for="fRec">Recording link (optional)</label>
+          <input id="fRec" name="recordingUrl" type="url" placeholder="https://">
+          <p class="hint">Everyone who registered can watch it from their profile.</p>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary btn-inline" type="submit" data-status="published">Publish event</button>
+          <button class="btn btn-inline" type="submit" data-status="draft">Save as draft</button>
+          <button class="btn btn-inline" type="button" data-go="events">Cancel</button>
+        </div>
+        <div class="msg" id="formMsg"></div>
+      </form>
+    </section>
+
+    <!-- Attendees -->
+    <section class="view" id="view-attendees">
+      <div class="top-row">
+        <div>
+          <h2>Attendees</h2>
+          <p class="muted small">Everyone registered for an event, with their ticket code.</p>
+        </div>
+        <button class="btn btn-inline" id="exportCsv">Download CSV</button>
+      </div>
+      <div class="field" style="max-width:420px;margin-top:20px">
+        <label for="attEvent">Event</label>
+        <select id="attEvent"></select>
+      </div>
+      <p class="muted small" id="attSummary"></p>
+      <div class="tbl-wrap" id="attTable"></div>
+    </section>
+
+    <!-- Check-in -->
+    <section class="view" id="view-checkin">
+      <h2>Check-in</h2>
+      <p class="muted small">Scan the QR code on the attendee's ticket with your camera, or type the code.</p>
+      <div class="split" style="margin-top:22px">
+        <form class="panel" id="checkForm" novalidate>
+          <div class="field">
+            <label for="ciEvent">Event</label>
+            <select id="ciEvent"></select>
+          </div>
+          <div class="field">
+            <label for="ciCode">Ticket code</label>
+            <input id="ciCode" type="text" placeholder="FY-XXXXXX" autocomplete="off" autocapitalize="characters" class="code">
+          </div>
+          <button class="btn btn-primary" type="submit">Check in</button>
+          <button class="btn" type="button" id="scanBtn" style="margin-top:10px">Scan with camera</button>
+          <div class="scanner hide" id="scanner"></div>
+          <div class="msg" id="ciMsg"></div>
+        </form>
+        <div class="panel">
+          <div class="big-n" id="ciCount"></div>
+          <p class="muted small" id="ciOf"></p>
+          <div class="bar"><i id="ciBar"></i></div>
+          <h3 style="margin-top:22px">Recently checked in</h3>
+          <ul class="list" id="ciRecent"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="view" id="view-settings">
+      <h2>Settings</h2>
+      <p class="muted small">Your business details, shown to attendees on your events.</p>
+      <form class="panel" id="settingsForm" style="margin-top:22px;max-width:560px" novalidate>
+        <div class="field">
+          <label for="sName">Business name</label>
+          <input id="sName" name="businessName" type="text" required>
+        </div>
+        <div class="field">
+          <label for="sPhone">Contact number</label>
+          <input id="sPhone" name="phone" type="tel" required>
+        </div>
+        <div class="field">
+          <label for="sEmail">Email address</label>
+          <input id="sEmail" type="email" disabled>
+          <p class="hint">Contact us to change the email on your account.</p>
+        </div>
+        <button class="btn btn-primary btn-inline" type="submit">Save changes</button>
+        <div class="msg" id="settingsMsg"></div>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+var F = Foyer, esc = F.esc, me, editing = null, attPick = null;
+
+function $(id) { return document.getElementById(id); }
+function say(el, text, ok) { el.className = 'msg ' + (ok ? 'msg-ok' : 'msg-err'); el.textContent = text; }
+function pct(a, b) { return b ? Math.min(100, Math.round(a / b * 100)) : 0; }
+
+/* ---------- navigation between views ---------- */
+function show(view) {
+  var m = /^edit-(.+)$/.exec(view);
+  if (m) { editing = m[1]; view = 'create'; }
+  if (!$('view-' + view)) view = 'dashboard';
+  document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + view); });
+  document.querySelectorAll('.side .nav').forEach(function (b) { b.classList.toggle('active', b.dataset.view === view); });
+  if (view !== 'create') resetForm();
+  if (view !== 'checkin') stopScan();
+  render[view]();
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-view],[data-go]');
+  if (!t) return;
+  e.preventDefault();
+  go(t.dataset.view || t.dataset.go);
+});
+/* Same-hash clicks do not fire hashchange, so render directly in that case. */
+function go(view) {
+  if (location.hash.slice(1) === view) show(view); else location.hash = view;
+}
+window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+
+$('logout').addEventListener('click', function (e) { e.preventDefault(); F.logout(); location.href = 'index.html'; });
+
+function myEvents() { return F.eventsByOwner(me.id); }
+function regCount(ev) { return F.registrationsForEvent(ev.id).length; }
+
+function statusTag(ev) {
+  if (ev.status === 'draft') return '<span class="tag">Draft</span>';
+  if (F.isPast(ev)) return '<span class="tag tag-done">Finished</span>';
+  if (F.seatsLeft(ev) === 0) return '<span class="tag tag-warn">Sold out</span>';
+  return '<span class="tag tag-live">Published</span>';
+}
+
+function fillEventSelect(sel, onlyPublished) {
+  var keep = sel.value;
+  var list = myEvents().filter(function (e) { return !onlyPublished || e.status === 'published'; });
+  sel.innerHTML = list.map(function (e) {
+    return '<option value="' + e.id + '">' + esc(e.title) + ' — ' + F.fmtDate(e.date) + '</option>';
+  }).join('') || '<option value="">No events yet</option>';
+  /* Default to the next upcoming event, which is the one you are most likely checking in. */
+  var upcoming = list.filter(function (e) { return !F.isPast(e); })[0];
+  sel.value = list.some(function (e) { return e.id === keep; }) ? keep : (upcoming || list[0] || {}).id || '';
+}
+
+var render = {};
+
+/* ---------- dashboard ---------- */
+render.dashboard = function () {
+  var events = myEvents();
+  var published = events.filter(function (e) { return e.status === 'published'; });
+  var regs = 0, collected = 0;
+  events.forEach(function (e) {
+    var n = regCount(e);
+    regs += n;
+    collected += n * (Number(e.price) + (e.catering ? Number(e.cateringPrice) : 0));
+  });
+  var upcoming = published.filter(function (e) { return !F.isPast(e); });
+  var next = upcoming[0];
+
+  $('welcome').textContent = 'Welcome back, ' + me.businessName;
+  $('billing').innerHTML = published.length <= 1
+    ? '<b>Your first event is free.</b> No platform fee is charged on your first published event. Billing starts from your second event.'
+    : '<b>First event free — used.</b> You have ' + published.length + ' published events. Platform fees apply from your second event onwards.';
+
+  $('stats').innerHTML = [
+    [published.length, 'Published events'],
+    [regs, 'Total registrations'],
+    [F.fmtMoney(collected).replace('Free', '$0'), 'Expected revenue'],
+    [next ? F.daysUntil(next.date) : '—', next ? 'Days to next event' : 'No upcoming events']
+  ].map(function (s) { return '<div class="card"><div class="n">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>'; }).join('');
+
+  if (next) {
+    var n = regCount(next);
+    var nv = F.venue(next.venue);
+    $('nextUp').innerHTML =
+      (nv ? '<img class="next-photo" src="' + nv.photo + '" alt="">' : '') +
+      '<h3>Next up</h3><div class="next"><div>' +
+      '<div class="when">' + F.fmtDate(next.date, true) + ' · ' + F.fmtTime(next.time) + '</div>' +
+      '<b style="font-size:20px;font-weight:500">' + esc(next.title) + '</b>' +
+      '<p class="muted small" style="margin:4px 0 0">' + esc(next.venue) + ' — ' + esc(next.room) + '</p></div>' +
+      '<div style="min-width:160px"><div class="big-n">' + n + '<span class="muted" style="font-size:20px"> / ' + next.capacity + '</span></div>' +
+      '<div class="bar"><i style="width:' + pct(n, next.capacity) + '%"></i></div></div></div>' +
+      '<div class="btn-row" style="margin-top:18px">' +
+      '<button class="btn btn-sm" data-go="checkin">Open check-in</button>' +
+      '<button class="btn btn-sm" data-edit="' + next.id + '">Edit event</button>' +
+      '<a class="btn btn-sm" href="event.html?id=' + next.id + '">View public page</a></div>';
+  } else {
+    $('nextUp').innerHTML = '<div class="empty"><b>Nothing coming up</b>Create an event and publish it to start taking registrations.' +
+      '<div style="margin-top:16px"><button class="btn btn-primary btn-inline" data-go="create">Create your first event</button></div></div>';
+  }
+
+  var ids = events.map(function (e) { return e.id; });
+  var latest = [];
+  ids.forEach(function (id) { latest = latest.concat(F.registrationsForEvent(id)); });
+  latest.sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
+  $('latest').innerHTML = latest.slice(0, 6).map(function (r) {
+    var ev = F.getEvent(r.eventId);
+    return '<li><span>' + esc(r.name) + '<br><small>' + esc(ev.title) + '</small></span><small>' +
+      new Date(r.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + '</small></li>';
+  }).join('') || '<li><small>No registrations yet.</small></li>';
+};
+
+/* ---------- my events ---------- */
+render.events = function () {
+  var events = myEvents();
+  if (!events.length) {
+    $('eventsTable').innerHTML = '<div class="empty"><b>No events yet</b>Your events will be listed here.</div>';
+    return;
+  }
+  $('eventsTable').innerHTML = '<table class="tbl"><thead><tr><th>Event</th><th>Date</th><th>Registered</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody>' +
+    events.map(function (e) {
+      var n = regCount(e);
+      return '<tr><td><b style="font-weight:500">' + esc(e.title) + '</b><br><small class="muted">' + esc(e.venue) + '</small></td>' +
+        '<td>' + F.fmtDate(e.date) + '</td>' +
+        '<td>' + n + ' of ' + e.capacity + '<div class="bar"><i style="width:' + pct(n, e.capacity) + '%"></i></div></td>' +
+        '<td>' + F.fmtMoney(e.price) + '</td>' +
+        '<td>' + statusTag(e) + '</td>' +
+        '<td><div class="actions-cell">' +
+          '<a class="btn btn-sm" href="event.html?id=' + e.id + '">View page</a>' +
+          '<button class="btn btn-sm" data-edit="' + e.id + '">Edit</button>' +
+          (e.status === 'draft'
+            ? '<button class="btn btn-sm" data-publish="' + e.id + '">Publish</button>'
+            : '<button class="btn btn-sm" data-people="' + e.id + '">Attendees</button>') +
+          '<button class="btn btn-sm btn-danger" data-delete="' + e.id + '">Delete</button>' +
+        '</div></td></tr>';
+    }).join('') + '</tbody></table>';
+};
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-edit],[data-publish],[data-people],[data-delete]');
+  if (!t) return;
+  var d = t.dataset;
+  if (d.edit) { editing = d.edit; go('create'); }
+  if (d.publish) { F.saveEvent({ id: d.publish, ownerId: me.id, status: 'published' }); render.events(); refreshCounts(); }
+  if (d.people) { attPick = d.people; go('attendees'); }
+  if (d.delete) {
+    var ev = F.getEvent(d.delete), n = regCount(ev);
+    if (confirm('Delete "' + ev.title + '"?' + (n ? ' This also cancels ' + n + ' registration(s).' : '') + ' This cannot be undone.')) {
+      F.deleteEvent(d.delete, me.id); render.events(); refreshCounts();
+    }
+  }
+});
+
+/* ---------- create / edit ---------- */
+var form = $('eventForm'), fe = form.elements;
+
+$('venueList').innerHTML = F.venues.map(function (v) { return '<option value="' + esc(v.name) + '">'; }).join('');
+
+function previewVenue() {
+  var v = F.venue(fe.venue.value), box = $('venuePreview');
+  box.classList.toggle('hide', !v);
+  if (v) box.innerHTML = '<img src="' + v.photo + '" alt=""><div><b>' + esc(v.name) + '</b><span>' + esc(v.address) + '</span></div>';
+}
+fe.venue.addEventListener('input', previewVenue);
+
+function resetForm() {
+  form.reset();
+  fe.id.value = '';
+  $('formTitle').textContent = 'Create an event';
+  $('formMsg').className = 'msg'; $('formMsg').textContent = '';
+  $('fDate').min = F.today();
+  previewVenue();
+}
+
+/* Runs when the create view opens. Fills the form if an Edit button sent us here. */
+render.create = function () {
+  var ev = editing && F.getEvent(editing);
+  editing = null;
+  if (!ev || ev.ownerId !== me.id) return;
+  ['id', 'title', 'description', 'date', 'time', 'venue', 'room', 'capacity', 'price', 'cateringPrice', 'recordingUrl']
+    .forEach(function (k) { fe[k].value = ev[k] == null ? '' : ev[k]; });
+  fe.catering.checked = !!ev.catering;
+  $('fDate').min = '';
+  $('formTitle').textContent = 'Edit event';
+  previewVenue();
+};
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var status = (e.submitter && e.submitter.dataset.status) || 'draft';
+  var bad = Array.prototype.filter.call(form.querySelectorAll('input,textarea'), function (i) { return !i.checkValidity(); })[0];
+  if (bad) {
+    say($('formMsg'), (bad.labels[0] ? bad.labels[0].textContent : 'A field') + ': ' + bad.validationMessage);
+    bad.focus();
+    return;
+  }
+  var ev = {
+    ownerId: me.id, status: status,
+    title: fe.title.value.trim(), description: fe.description.value.trim(),
+    date: fe.date.value, time: fe.time.value,
+    venue: fe.venue.value.trim(), room: fe.room.value.trim(),
+    capacity: parseInt(fe.capacity.value, 10), price: Number(fe.price.value) || 0,
+    catering: fe.catering.checked, cateringPrice: fe.catering.checked ? (Number(fe.cateringPrice.value) || 0) : 0,
+    recordingUrl: fe.recordingUrl.value.trim()
+  };
+  if (fe.id.value) {
+    ev.id = fe.id.value;
+    var taken = regCount(ev);
+    if (ev.capacity < taken) { say($('formMsg'), 'Seats cannot be lower than the ' + taken + ' people already registered.'); return; }
+  }
+  F.saveEvent(ev);
+  refreshCounts();
+  go('events');
+});
+
+/* ---------- attendees ---------- */
+render.attendees = function () {
+  fillEventSelect($('attEvent'));
+  if (attPick) { $('attEvent').value = attPick; attPick = null; }
+  var ev = F.getEvent($('attEvent').value);
+  if (!ev) { $('attSummary').textContent = ''; $('attTable').innerHTML = '<div class="empty"><b>No events yet</b></div>'; return; }
+  var regs = F.registrationsForEvent(ev.id);
+  var inCount = regs.filter(function (r) { return r.checkedInAt; }).length;
+  $('attSummary').textContent = regs.length + ' registered · ' + inCount + ' checked in · ' + F.seatsLeft(ev) + ' seats left';
+  $('attTable').innerHTML = regs.length
+    ? '<table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Ticket</th><th>Registered</th><th>Checked in</th></tr></thead><tbody>' +
+      regs.map(function (r) {
+        return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.email) + '</td><td class="code">' + esc(r.code) + '</td>' +
+          '<td>' + new Date(r.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) + '</td>' +
+          '<td>' + (r.checkedInAt ? '<span class="tag tag-live">' + new Date(r.checkedInAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' }) + '</span>' : '<span class="tag">Not yet</span>') + '</td></tr>';
+      }).join('') + '</tbody></table>'
+    : '<div class="empty"><b>No one has registered yet</b>Share the event to start filling seats.</div>';
+};
+$('attEvent').addEventListener('change', render.attendees);
+
+$('exportCsv').addEventListener('click', function () {
+  var ev = F.getEvent($('attEvent').value);
+  if (!ev) return;
+  var rows = [['Name', 'Email', 'Ticket code', 'Registered', 'Checked in']].concat(
+    F.registrationsForEvent(ev.id).map(function (r) { return [r.name, r.email, r.code, r.createdAt, r.checkedInAt || '']; }));
+  var csv = rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = ev.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '-attendees.csv';
+  a.click();
+});
+
+/* ---------- check-in ---------- */
+render.checkin = function () {
+  fillEventSelect($('ciEvent'), true);
+  var ev = F.getEvent($('ciEvent').value);
+  if (!ev) { $('ciCount').textContent = '0'; $('ciOf').textContent = 'Publish an event to use check-in.'; $('ciRecent').innerHTML = ''; return; }
+  var regs = F.registrationsForEvent(ev.id);
+  var done = regs.filter(function (r) { return r.checkedInAt; })
+    .sort(function (a, b) { return a.checkedInAt < b.checkedInAt ? 1 : -1; });
+  $('ciCount').textContent = done.length;
+  $('ciOf').textContent = 'of ' + regs.length + ' registered have arrived';
+  $('ciBar').style.width = pct(done.length, regs.length) + '%';
+  $('ciRecent').innerHTML = done.slice(0, 6).map(function (r) {
+    return '<li><span>' + esc(r.name) + '<br><small class="code">' + esc(r.code) + '</small></span><small>' +
+      new Date(r.checkedInAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' }) + '</small></li>';
+  }).join('') || '<li><small>No one yet.</small></li>';
+  $('ciCode').focus();
+};
+$('ciEvent').addEventListener('change', function () { $('ciMsg').className = 'msg'; $('ciMsg').textContent = ''; render.checkin(); });
+
+$('checkForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  try {
+    var reg = F.checkIn($('ciCode').value, $('ciEvent').value, me.id);
+    say($('ciMsg'), 'Welcome, ' + reg.name + '. Checked in.', true);
+    $('ciCode').value = '';
+  } catch (err) {
+    say($('ciMsg'), err.message);
+  }
+  render.checkin();
+});
+
+/* ---------- camera scanning ----------
+   The scanner library is only downloaded the first time someone taps the button. */
+var scanner = null;
+var SCAN_LIB = 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+
+function loadScanLib() {
+  if (window.Html5Qrcode) return Promise.resolve();
+  return new Promise(function (ok, fail) {
+    var tag = document.createElement('script');
+    tag.src = SCAN_LIB;
+    tag.onload = ok;
+    tag.onerror = function () { fail(new Error('Could not load the scanner. Check your internet connection, or type the code instead.')); };
+    document.head.appendChild(tag);
+  });
+}
+
+function stopScan() {
+  if (!scanner) return;
+  var s = scanner;
+  scanner = null;
+  s.stop().catch(function () {}).then(function () { s.clear(); });
+  $('scanner').classList.add('hide');
+  $('scanBtn').textContent = 'Scan with camera';
+}
+
+$('scanBtn').addEventListener('click', function () {
+  if (scanner) { stopScan(); return; }
+  $('scanBtn').textContent = 'Starting camera…';
+  loadScanLib().then(function () {
+    $('scanner').classList.remove('hide');
+    scanner = new Html5Qrcode('scanner');
+    return scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: 220 }, function (text) {
+      $('ciCode').value = text;
+      stopScan();
+      $('checkForm').requestSubmit();
+    }, function () { /* no code in this frame yet */ });
+  }).then(function () {
+    $('scanBtn').textContent = 'Stop camera';
+  }).catch(function (err) {
+    scanner = null;
+    $('scanner').classList.add('hide');
+    $('scanBtn').textContent = 'Scan with camera';
+    var m = String(err && (err.message || err));
+    say($('ciMsg'), /Permission|NotAllowed/i.test(m)
+      ? 'Camera access was blocked. Allow the camera in your browser, or type the code instead.'
+      : /NotFound|no camera|Requested device/i.test(m)
+        ? 'No camera was found on this device. Type the code instead.'
+        : m);
+  });
+});
+
+/* ---------- settings ---------- */
+render.settings = function () {
+  $('sName').value = me.businessName;
+  $('sPhone').value = me.phone;
+  $('sEmail').value = me.email;
+};
+$('settingsForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!$('sName').value.trim()) { say($('settingsMsg'), 'Business name cannot be empty.'); return; }
+  me = F.updateUser(me.id, { businessName: $('sName').value, phone: $('sPhone').value });
+  paintWho();
+  say($('settingsMsg'), 'Saved.', true);
+});
+
+function paintWho() {
+  $('whoName').textContent = me.businessName;
+  $('avatar').textContent = F.initials(me);
+}
+function refreshCounts() { $('countEvents').textContent = myEvents().length; }
+
+/* ---------- start ---------- */
+F.requireUser('business').then(function (user) {
+  me = user;
+  paintWho();
+  refreshCounts();
+  var h = location.hash.slice(1);
+  show(h === 'welcome' ? 'dashboard' : h);
+}).catch(function () {});
+</script>
+
+</body>
+</html>

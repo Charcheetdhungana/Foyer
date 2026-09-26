@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foyer — run your event, fill your seats</title>
+<meta name="description" content="Foyer brings venue, catering, tickets, check-in and recordings together in one place. Your first event is free.">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container">
+
+    <a class="logo" href="index.html">
+      <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4DD6C1"/>
+            <stop offset="100%" stop-color="#5B7CFA"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+        <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+      </svg>
+      Foyer
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Menu</button>
+
+    <nav class="site-nav" id="siteNav">
+      <div class="nav-item"><a href="#events">Find events</a></div>
+
+      <div class="nav-item">
+        <a href="#business">For businesses</a>
+        <div class="drop">
+          <a href="#business"><b>Why Foyer</b><span>What makes us different</span></a>
+          <a href="#services"><b>What we offer</b><span>Venues, catering, tickets, check-in</span></a>
+          <a href="#pricing"><b>Pricing</b><span>First event free, then simple fees</span></a>
+          <a href="#contact"><b>Contact</b><span>Talk to us about your event</span></a>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="team.html">Team</a></div>
+      <div class="nav-item" id="navLogin"><a href="login.html">Log in</a></div>
+      <div class="nav-item" id="navCta"><a class="nav-cta" href="signup.html">Sign up</a></div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero hero-home">
+  <div class="aurora">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+  <div class="container hero-grid">
+    <div>
+      <h1 class="rise d1">Events, handled.<br><span class="shine">Booking to the door.</span></h1>
+      <p class="rise d2">Planning an event? We'll organise everything for you,
+         so you don't have to worry about a thing.</p>
+      <p class="hero-alt rise d3">Already have a ticket? <a href="login.html?role=personal">Log in to see it</a>.</p>
+    </div>
+
+    <div class="doors rise d3">
+      <a class="door" href="#events">
+        <span class="door-tag">For attendees</span>
+        <b>Going to an event?</b>
+        <span>Find events around Sydney and get your ticket in a minute. Free to join, no booking fees.</span>
+        <span class="door-cta">Browse events &rarr;</span>
+      </a>
+      <a class="door door-biz" href="#business">
+        <span class="door-tag">For businesses</span>
+        <b>Running an event?</b>
+        <span>Venue, catering, tickets and check-in in one place. Your first event is free.</span>
+        <span class="door-cta">See how it works &rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section band-light" id="events">
+  <div class="container">
+    <p class="eyebrow-ink reveal">For attendees</p>
+    <h2 class="reveal">Upcoming events</h2>
+    <p class="muted reveal">Open to everyone. No account needed to look — you only sign up when you get a ticket.</p>
+
+    <div class="filters reveal" role="search">
+      <input id="evSearch" type="search" placeholder="Search events, venues or organisers" aria-label="Search events">
+      <div class="chips" id="evChips" role="group" aria-label="Filter events">
+        <button type="button" class="chip on" data-f="all">All</button>
+        <button type="button" class="chip" data-f="month">Next 30 days</button>
+        <button type="button" class="chip" data-f="free">Free</button>
+        <button type="button" class="chip" data-f="food">Food included</button>
+      </div>
+      <select id="evVenue" aria-label="Venue"><option value="">All venues</option></select>
+    </div>
+    <p class="muted small" id="evCount"></p>
+    <div class="grid3" id="eventGrid"></div>
+  </div>
+</section>
+
+<section class="section band-light" id="venues">
+  <div class="container">
+    <h2 class="reveal">Venues on Foyer</h2>
+    <p class="muted reveal">Spaces our organisers use across Sydney. Click one to see its events.</p>
+    <div class="venue-grid" id="venueGrid"></div>
+  </div>
+</section>
+
+<section class="section band-soft" id="business">
+  <div class="container">
+    <p class="eyebrow-ink reveal">For businesses</p>
+    <h2 class="reveal">Every part of your event, managed in one place</h2>
+    <p class="lede lede-wide reveal">
+      Most small organisers juggle one tool for bookings, another for emails, a spreadsheet for the
+      guest list and a printed sheet at the door. Details get copied by hand from one to the next,
+      and that is where things go wrong — the same seat is sold twice, or guests turn up in the wrong
+      room. Foyer puts it all in one place. Every guest has one record, from the moment they book to
+      the moment they walk in.
+    </p>
+
+    <div class="why">
+      <div class="reveal"><b>Venue and catering built in</b>
+        <span>Book the space and the food alongside your tickets. Catering is shown in the ticket price.</span></div>
+      <div class="reveal"><b>The exact room, on every ticket</b>
+        <span>Attendees see the room, a map and directions — not just a street address.</span></div>
+      <div class="reveal"><b>One record per attendee</b>
+        <span>From sign-up to check-in to the recording afterwards. No spreadsheets, no retyping.</span></div>
+      <div class="reveal"><b>Your first event is free</b>
+        <span>No platform fee until your second event. Attendees never pay a booking fee.</span></div>
+    </div>
+
+    <h2 class="reveal" id="services" style="margin-top:64px">What we offer</h2>
+    <p class="muted reveal">Everything an event needs, under one login.</p>
+    <div class="grid3" style="margin-top:26px">
+      <div class="card svc reveal" id="svc-venues"><div class="ico">01</div>
+        <h3>Venues</h3><p>Pick a venue from our list or type in your own, and tell attendees exactly which room to go to.</p></div>
+      <div class="card svc reveal" id="svc-catering"><div class="ico">02</div>
+        <h3>Catering</h3><p>Add food and drink and set a price per head. It is shown in the ticket price, so there are no surprises.</p></div>
+      <div class="card svc reveal" id="svc-tickets"><div class="ico">03</div>
+        <h3>Tickets</h3><p>Attendees register and receive a digital ticket with a QR code straight away.</p></div>
+      <div class="card svc reveal" id="svc-checkin"><div class="ico">04</div>
+        <h3>Check-in</h3><p>Scan the QR code with your phone camera, or type the code. Duplicates are caught instantly.</p></div>
+      <div class="card svc reveal" id="svc-map"><div class="ico">05</div>
+        <h3>Venue map</h3><p>Every event page and ticket shows the room, a map of the venue and one-tap directions.</p></div>
+      <div class="card svc reveal" id="svc-recording"><div class="ico">06</div>
+        <h3>Recording</h3><p>Add a recording link after the event and everyone who registered can watch it from their profile.</p></div>
+    </div>
+    <div class="actions reveal">
+      <a class="btn btn-primary btn-inline" href="signup.html?role=business">Start your first event free</a>
+      <a class="btn btn-inline" href="#pricing">See pricing</a>
+    </div>
+  </div>
+</section>
+
+<section class="section band-light" id="team">
+  <div class="container">
+    <h2 class="reveal">Team Foyer</h2>
+    <p class="muted reveal">We built Foyer because organising an event shouldn't be complicated, so we created one platform that does it all. <a class="team-link" href="team.html">Meet the team &rarr;</a></p>
+    <div class="team">
+      <div class="person reveal">
+        <div class="photo p1"><img src="images/team/charchit.jpg" alt="Charchit Dhungana" onerror="this.remove()">CD</div>
+        <b>Charchit Dhungana</b>
+        <span>Founder · Front end and security</span>
+      </div>
+      <div class="person reveal">
+        <div class="photo p2"><img src="images/team/prithvi.jpg" alt="Prithvi Shrestha" onerror="this.remove()">PS</div>
+        <b>Prithvi Shrestha</b>
+        <span>Database and back end</span>
+      </div>
+      <div class="person reveal">
+        <div class="photo p3"><img src="images/team/abiral.jpg" alt="Abiral Tiwari" onerror="this.remove()">AT</div>
+        <b>Abiral Tiwari</b>
+        <span>Testing and documentation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container split-2">
+    <div>
+      <h2 class="reveal">First event free</h2>
+      <p class="muted reveal" style="max-width:48ch">
+        New businesses pay no platform fee on their first published event. Charges begin from the
+        second event, once you have seen the platform work. Attendees never pay a booking fee.
+      </p>
+      <div class="actions reveal">
+        <a class="btn btn-primary btn-inline" href="signup.html?role=business">Create a business account</a>
+      </div>
+    </div>
+
+    <form class="panel reveal" id="contact" novalidate>
+      <h3>Contact us</h3>
+      <p class="muted small">Questions about running an event, or about a ticket? Send us a note.</p>
+      <div class="field">
+        <label for="cName">Your name</label>
+        <input id="cName" type="text" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="cEmail">Email address</label>
+        <input id="cEmail" type="email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="cMsg">Message</label>
+        <textarea id="cMsg" required maxlength="1000"></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit">Send message</button>
+      <div class="msg" id="cResult"></div>
+    </form>
+  </div>
+</section>
+
+<footer class="foot-lux">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="index.html">
+          <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#4DD6C1"/>
+                <stop offset="100%" stop-color="#5B7CFA"/>
+              </linearGradient>
+            </defs>
+            <rect width="40" height="40" rx="11" fill="url(#lg2)"/>
+            <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+            <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+          </svg>
+          Foyer
+        </a>
+        <p>Everything an event needs — venue, catering, tickets, check-in and the
+           recording afterwards. First event free.</p>
+      </div>
+      <div>
+        <h5>Platform</h5>
+        <a href="#events">Find events</a>
+        <a href="signup.html?role=business">Start an event</a>
+        <a href="login.html">Log in</a>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <a href="#business">For businesses</a>
+        <a href="team.html">Our team</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="made">
+      <span>Designed and built by <a class="inline" href="team.html"><b>Team Foyer</b></a> — Sydney, Australia</span>
+      <span>© <span data-year>2026</span> Foyer · Venue photos from <a class="inline" href="images/venues/CREDITS.txt">Wikimedia Commons</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+var F = Foyer, esc = F.esc;
+
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry, i) {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i * 90) + 'ms';
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+function photoFor(name) {
+  var v = F.venue(name);
+  return v ? '<img src="' + v.photo + '" alt="' + esc(v.name) + '" loading="lazy">'
+           : '<span class="ph-fallback">' + esc(name) + '</span>';
+}
+
+var filter = 'all';
+
+function eventCard(ev) {
+  var left = F.seatsLeft(ev);
+  return '<a class="card ev-card" href="event.html?id=' + ev.id + '">' +
+    '<div class="ev-photo">' + photoFor(ev.venue) + '</div>' +
+    '<div class="ev-body">' +
+      '<span class="date">' + F.fmtDate(ev.date, true) + ' · ' + F.fmtTime(ev.time) + '</span>' +
+      '<h3>' + esc(ev.title) + '</h3>' +
+      '<p>' + esc(ev.venue) + ' · by ' + esc(F.organiserName(ev)) + '</p>' +
+      '<div class="foot"><b class="price">' + F.fmtMoney(F.ticketTotal(ev)) + '</b>' +
+      '<span class="tag ' + (left === 0 ? '' : left < 10 ? 'tag-warn' : 'tag-live') + '">' + (left ? left + ' seats left' : 'Sold out') + '</span></div>' +
+    '</div></a>';
+}
+
+function renderEvents() {
+  var q = document.getElementById('evSearch').value.trim().toLowerCase();
+  var venue = document.getElementById('evVenue').value;
+  var list = F.publicEvents().filter(function (ev) {
+    if (q && (ev.title + ' ' + ev.venue + ' ' + ev.description + ' ' + F.organiserName(ev)).toLowerCase().indexOf(q) === -1) return false;
+    if (venue && ev.venue !== venue) return false;
+    if (filter === 'month' && F.daysUntil(ev.date) > 30) return false;
+    if (filter === 'free' && F.ticketTotal(ev) > 0) return false;
+    if (filter === 'food' && !ev.catering) return false;
+    return true;
+  });
+  var total = F.publicEvents().length;
+  document.getElementById('evCount').textContent = list.length === total
+    ? total + ' upcoming ' + (total === 1 ? 'event' : 'events')
+    : 'Showing ' + list.length + ' of ' + total + ' events';
+  document.getElementById('eventGrid').innerHTML = list.map(eventCard).join('') ||
+    '<div class="empty-light"><b>No events match</b>Try another search or <button type="button" class="linkish" id="clearFilters">clear the filters</button>.</div>';
+  var clear = document.getElementById('clearFilters');
+  if (clear) clear.addEventListener('click', function () { setFilter('all'); document.getElementById('evSearch').value = ''; document.getElementById('evVenue').value = ''; renderEvents(); });
+}
+
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll('#evChips .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.f === f); });
+}
+
+document.getElementById('evChips').addEventListener('click', function (e) {
+  var c = e.target.closest('.chip');
+  if (!c) return;
+  setFilter(c.dataset.f);
+  renderEvents();
+});
+document.getElementById('evSearch').addEventListener('input', renderEvents);
+document.getElementById('evVenue').addEventListener('change', renderEvents);
+
+F.ready.then(function () {
+  document.getElementById('evVenue').innerHTML += F.venues.map(function (v) {
+    return '<option value="' + esc(v.name) + '">' + esc(v.name) + '</option>';
+  }).join('');
+  renderEvents();
+
+  document.getElementById('venueGrid').innerHTML = F.venues.map(function (v) {
+    var count = F.publicEvents().filter(function (e) { return F.venue(e.venue) === v; }).length;
+    return '<button type="button" class="venue reveal" data-venue="' + esc(v.name) + '">' +
+      '<img src="' + v.photo + '" alt="" loading="lazy">' +
+      '<span class="cap"><b>' + esc(v.name) + '</b><span>' + esc(v.address) + '</span>' +
+      '<em>' + (count ? count + ' upcoming ' + (count === 1 ? 'event' : 'events') : 'No events right now') + '</em>' +
+      '</span></button>';
+  }).join('');
+
+  document.getElementById('venueGrid').addEventListener('click', function (e) {
+    var v = e.target.closest('[data-venue]');
+    if (!v) return;
+    document.getElementById('evVenue').value = v.dataset.venue;
+    setFilter('all');
+    renderEvents();
+    document.getElementById('events').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+});
+
+document.getElementById('contact').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var out = document.getElementById('cResult');
+  var bad = Array.prototype.filter.call(this.querySelectorAll('input,textarea'), function (i) { return !i.checkValidity(); })[0];
+  if (bad) {
+    out.className = 'msg msg-err';
+    out.textContent = bad.labels[0].textContent + ': ' + bad.validationMessage;
+    bad.focus();
+    return;
+  }
+  F.sendMessage({ name: this.querySelector('#cName').value.trim(), email: this.querySelector('#cEmail').value.trim(),
+                  message: this.querySelector('#cMsg').value.trim() });
+  this.reset();
+  out.className = 'msg msg-ok';
+  out.textContent = 'Thanks — your message has been sent to the Foyer team.';
+});
+</script>
+
+</body>
+</html>

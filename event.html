@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event — Foyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container">
+    <a class="logo" href="index.html">
+      <svg class="logo-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4DD6C1"/><stop offset="100%" stop-color="#5B7CFA"/>
+        </linearGradient></defs>
+        <rect width="40" height="40" rx="11" fill="url(#lg)"/>
+        <path d="M14 29V19a6 6 0 0 1 12 0v10" fill="none" stroke="#06213C" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24.2" cy="24.5" r="1.7" fill="#06213C"/>
+      </svg>
+      Foyer
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <div class="nav-item"><a href="index.html">Home</a></div>
+      <div class="nav-item"><a href="index.html#events">Events</a></div>
+      <div class="nav-item"><a href="team.html">Team</a></div>
+      <div class="nav-item" id="navLogin"><a href="login.html">Log in</a></div>
+      <div class="nav-item" id="navCta"><a class="nav-cta" href="signup.html">Sign up</a></div>
+    </nav>
+  </div>
+</header>
+
+<div id="page"></div>
+
+<footer class="foot-lux">
+  <div class="container">
+    <div class="made">
+      <span>Designed and built by <a class="inline" href="team.html"><b>Team Foyer</b></a> — Sydney, Australia</span>
+      <span>© <span data-year>2026</span> Foyer</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+var F = Foyer, esc = F.esc;
+var id = new URLSearchParams(location.search).get('id');
+var page = document.getElementById('page');
+
+function notFound() {
+  document.title = 'Event not found — Foyer';
+  page.innerHTML = '<div class="container"><div class="auth" style="max-width:560px">' +
+    '<h1>Event not found</h1><p class="muted">This event may have been removed, or it has not been published yet.</p>' +
+    '<a class="btn btn-primary btn-inline" href="index.html#events">See upcoming events</a></div></div>';
+}
+
+/* The box on the right changes depending on who is looking. */
+function actionBox(ev, user) {
+  var left = F.seatsLeft(ev), past = F.isPast(ev);
+  var reg = user && user.role === 'personal' &&
+    F.registrationsForUser(user.id).filter(function (r) { return r.eventId === ev.id; })[0];
+
+  if (user && user.role === 'business' && user.id === ev.ownerId)
+    return '<p class="small">This is your event.</p>' +
+      '<a class="btn btn-primary" href="business.html#edit-' + ev.id + '">Edit event</a>' +
+      '<a class="btn" style="margin-top:10px" href="business.html#attendees">See attendees</a>';
+
+  if (past) {
+    if (reg && /^https?:\/\//.test(ev.recordingUrl || ''))
+      return '<p class="small">This event has finished. Thanks for coming!</p>' +
+        '<a class="btn btn-primary" target="_blank" rel="noopener" href="' + esc(ev.recordingUrl) + '">Watch the recording</a>';
+    return '<p class="small">This event has finished.</p>' +
+      '<a class="btn" href="index.html#events">See upcoming events</a>';
+  }
+
+  if (reg)
+    return '<p class="small"><span class="tag tag-live">You are going</span></p>' +
+      '<p class="small muted">Your ticket code is <b class="code">' + esc(reg.code) + '</b>.</p>' +
+      '<a class="btn btn-primary" href="personal.html#tickets">View my ticket</a>' +
+      '<button class="btn" id="addCal" data-reg="' + reg.id + '">Add to calendar</button>';
+
+  if (left === 0) return '<button class="btn" disabled>Sold out</button>';
+
+  if (!user)
+    return '<a class="btn btn-primary" href="login.html?role=personal&reason=ticket&next=' +
+      encodeURIComponent('event.html?id=' + ev.id) + '">Get a ticket</a>' +
+      '<p class="hint" style="text-align:center">Takes a minute. You will log in or create a free account first.</p>';
+
+  if (user.role === 'business')
+    return '<p class="small">You are logged in as a business. Tickets are for personal accounts.</p>' +
+      '<button class="btn" id="switchAcct">Log out and use a personal account</button>';
+
+  return '<button class="btn btn-primary" id="getTicket">Get a ticket · ' + F.fmtMoney(F.ticketTotal(ev)) + '</button>' +
+    '<p class="hint" style="text-align:center">Your ticket and QR code are ready straight away.</p>';
+}
+
+function render() {
+  var ev = id && F.getEvent(id);
+  var user = F.currentUser();
+  var isOwner = ev && user && user.id === ev.ownerId;
+  if (!ev || (ev.status !== 'published' && !isOwner)) return notFound();
+
+  var v = F.venue(ev.venue);
+  var regs = F.registrationsForEvent(ev.id).length;
+  var left = F.seatsLeft(ev);
+  var place = (v ? v.address : ev.venue + ', Sydney NSW');
+  document.title = ev.title + ' — Foyer';
+
+  page.innerHTML =
+    '<section class="ev-hero">' +
+      (v ? '<img src="' + v.photo + '" alt="' + esc(v.name) + '">' : '') +
+      '<div class="container">' +
+        (ev.status === 'draft' ? '<span class="tag">Draft — only you can see this</span> ' : '') +
+        (F.isPast(ev) ? '<span class="tag tag-done">Finished</span>' : '<span class="tag tag-live">' + F.fmtDate(ev.date, true) + '</span>') +
+        '<h1>' + esc(ev.title) + '</h1>' +
+        '<p>Hosted by ' + esc(F.organiserName(ev)) + ' · ' + esc(ev.venue) + '</p>' +
+      '</div>' +
+    '</section>' +
+
+    '<div class="container ev-layout">' +
+      '<div>' +
+        '<div class="panel"><h3>About this event</h3><p>' + esc(ev.description) + '</p></div>' +
+
+        '<div class="panel"><h3>When and where</h3>' +
+          '<div class="facts">' +
+            '<div><span>Date</span><b>' + F.fmtDate(ev.date, true) + '</b></div>' +
+            '<div><span>Starts</span><b>' + F.fmtTime(ev.time) + '</b></div>' +
+            '<div><span>Venue</span><b>' + esc(ev.venue) + '</b><small>' + esc(place) + '</small></div>' +
+            '<div><span>Go to</span><b>' + esc(ev.room) + '</b><small>Printed on your ticket too</small></div>' +
+          '</div>' +
+          '<iframe class="map" loading="lazy" title="Map of ' + esc(ev.venue) + '" referrerpolicy="no-referrer-when-downgrade" ' +
+            'src="https://www.google.com/maps?q=' + encodeURIComponent(place) + '&output=embed"></iframe>' +
+          '<a class="btn btn-sm" style="margin-top:12px" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' +
+            encodeURIComponent(place) + '">Get directions</a>' +
+        '</div>' +
+
+        '<div class="panel"><h3>What is included</h3><ul class="list">' +
+          '<li><span>Entry and digital ticket with QR code</span><small>' + F.fmtMoney(ev.price) + '</small></li>' +
+          '<li><span>' + (ev.catering ? 'Food and drink' : 'No catering — food is not provided') + '</span><small>' +
+            (ev.catering ? (Number(ev.cateringPrice) > 0 ? F.fmtMoney(ev.cateringPrice) + ' per head' : 'Included') : '—') + '</small></li>' +
+          '<li><span>Recording afterwards</span><small>' + (ev.recordingUrl ? 'Available to attendees' : 'If the organiser shares one') + '</small></li>' +
+        '</ul></div>' +
+        (v ? '<p class="credit">' + esc(v.credit) + '</p>' : '') +
+      '</div>' +
+
+      '<aside class="panel buy">' +
+        '<div class="price-big">' + F.fmtMoney(F.ticketTotal(ev)) + '</div>' +
+        '<p class="muted small">' + (ev.catering && Number(ev.cateringPrice) > 0 ? 'Includes ' + F.fmtMoney(ev.cateringPrice) + ' catering' : 'Total per person') + '</p>' +
+        '<p class="small" style="margin:14px 0 4px">' + (left ? left + ' of ' + ev.capacity + ' seats left' : 'All ' + ev.capacity + ' seats taken') + '</p>' +
+        '<div class="bar" style="margin-bottom:18px"><i style="width:' + Math.round(regs / ev.capacity * 100) + '%"></i></div>' +
+        '<div id="action">' + actionBox(ev, user) + '</div>' +
+        '<div class="msg" id="actionMsg"></div>' +
+      '</aside>' +
+    '</div>';
+
+  var get = document.getElementById('getTicket');
+  if (get) get.addEventListener('click', function () {
+    try {
+      F.register(ev.id, user);
+      render();
+      var m = document.getElementById('actionMsg');
+      m.className = 'msg msg-ok';
+      m.textContent = 'You are going! Your ticket is saved under My tickets.';
+    } catch (err) {
+      var m2 = document.getElementById('actionMsg');
+      m2.className = 'msg msg-err';
+      m2.textContent = err.message;
+    }
+  });
+  var cal = document.getElementById('addCal');
+  if (cal) cal.addEventListener('click', function () {
+    var r = F.registrationsForUser(user.id).filter(function (x) { return x.id === cal.dataset.reg; })[0];
+    if (r) F.downloadCalendar(ev, r);
+  });
+  var sw = document.getElementById('switchAcct');
+  if (sw) sw.addEventListener('click', function () {
+    F.logout();
+    location.href = 'login.html?role=personal&reason=ticket&next=' + encodeURIComponent('event.html?id=' + ev.id);
+  });
+}
+
+F.ready.then(render);
+</script>
+
+</body>
+</html>

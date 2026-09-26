@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My tickets — Foyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="portal">
+
+  <aside class="side">
+    <div class="who">
+      <div class="avatar" id="avatar"></div>
+      <div>
+        <b id="whoName"></b>
+        <span>Personal account</span>
+      </div>
+      <button class="menu-btn" type="button" aria-expanded="false">Menu</button>
+    </div>
+
+    <h4>Going out</h4>
+    <button class="nav" data-view="tickets">My tickets <span class="count" id="countTickets"></span></button>
+    <button class="nav" data-view="find">Find events</button>
+    <button class="nav" data-view="profile">My profile</button>
+
+    <h4>Account</h4>
+    <a href="index.html">Home page</a>
+    <a href="#" id="logout">Log out</a>
+  </aside>
+
+  <main class="main">
+
+    <!-- My tickets -->
+    <section class="view" id="view-tickets">
+      <div class="top-row">
+        <div>
+          <h2 id="hello"></h2>
+          <p class="muted small" id="helloSub"></p>
+        </div>
+        <button class="btn btn-primary btn-inline" data-go="find">Find events</button>
+      </div>
+      <div class="msg" id="ticketMsg"></div>
+      <div class="tickets" id="ticketList" style="margin-top:22px"></div>
+    </section>
+
+    <!-- Find events -->
+    <section class="view" id="view-find">
+      <h2>Find events</h2>
+      <p class="muted small">Upcoming events open for registration. Open one to see the venue, room and what is included.</p>
+      <div class="field" style="max-width:420px;margin-top:18px">
+        <label for="search">Search</label>
+        <input id="search" type="search" placeholder="Event name, venue or organiser">
+      </div>
+      <div class="grid3" id="findList"></div>
+    </section>
+
+    <!-- Profile and history -->
+    <section class="view" id="view-profile">
+      <div class="profile-head">
+        <div class="avatar avatar-lg" id="pAvatar"></div>
+        <div>
+          <h2 id="pName"></h2>
+          <p class="muted small" id="pSince"></p>
+        </div>
+      </div>
+
+      <div class="cards" id="pStats"></div>
+
+      <h3 class="sub-h">Places you have been</h3>
+      <div class="venue-grid venue-grid-sm" id="pVenues"></div>
+
+      <h3 class="sub-h">Event history</h3>
+      <div class="history" id="pHistory"></div>
+
+      <h3 class="sub-h">Your details</h3>
+      <p class="muted small">This name is printed on your tickets and shown to organisers at check-in.</p>
+      <form class="panel" id="profileForm" style="margin-top:14px;max-width:560px" novalidate>
+        <div class="row2">
+          <div class="field">
+            <label for="pFirst">First name</label>
+            <input id="pFirst" type="text" autocomplete="given-name" required>
+          </div>
+          <div class="field">
+            <label for="pLast">Last name</label>
+            <input id="pLast" type="text" autocomplete="family-name" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="pPhone">Phone number</label>
+          <input id="pPhone" type="tel" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="pEmail">Email address</label>
+          <input id="pEmail" type="email" disabled>
+          <p class="hint">Tickets and event updates are sent here.</p>
+        </div>
+        <button class="btn btn-primary btn-inline" type="submit">Save changes</button>
+        <div class="msg" id="profileMsg"></div>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="js/db.js"></script>
+<script src="js/site.js"></script>
+<script>
+var F = Foyer, esc = F.esc, me;
+
+function $(id) { return document.getElementById(id); }
+function say(el, text, ok) { el.className = 'msg ' + (ok ? 'msg-ok' : 'msg-err'); el.textContent = text; }
+function photo(name, cls) {
+  var v = F.venue(name);
+  return v ? '<img class="' + (cls || '') + '" src="' + v.photo + '" alt="' + esc(v.name) + '" loading="lazy">'
+           : '<span class="ph-fallback ' + (cls || '') + '">' + esc(name) + '</span>';
+}
+
+/* ---------- navigation between views ---------- */
+
+function show(view) {
+  var m = /^event-(.+)$/.exec(view);
+  if (m) { location.replace('event.html?id=' + encodeURIComponent(m[1])); return; }
+  if (view === 'past') view = 'profile';
+  if (!$('view-' + view)) view = 'tickets';
+  document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + view); });
+  document.querySelectorAll('.side .nav').forEach(function (b) { b.classList.toggle('active', b.dataset.view === view); });
+  render[view]();
+  window.scrollTo(0, 0);
+}
+function go(view) {
+  if (location.hash.slice(1) === view) show(view); else location.hash = view;
+}
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-view],[data-go]');
+  if (!t) return;
+  e.preventDefault();
+  go(t.dataset.view || t.dataset.go);
+});
+window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+
+$('logout').addEventListener('click', function (e) { e.preventDefault(); F.logout(); location.href = 'index.html'; });
+
+function myTickets() {
+  return F.registrationsForUser(me.id).map(function (r) { return { reg: r, ev: F.getEvent(r.eventId) }; })
+    .filter(function (t) { return t.ev; })
+    .sort(function (a, b) { return a.ev.date < b.ev.date ? -1 : 1; });
+}
+
+function whenText(ev) {
+  var d = F.daysUntil(ev.date);
+  return d === 0 ? 'Today' : d === 1 ? 'Tomorrow' : 'In ' + d + ' days';
+}
+
+var render = {};
+
+/* ---------- my tickets ---------- */
+render.tickets = function () {
+  var upcoming = myTickets().filter(function (t) { return !F.isPast(t.ev); });
+  $('hello').textContent = 'Hi, ' + me.firstName;
+  $('helloSub').textContent = upcoming.length
+    ? 'You have ' + upcoming.length + ' upcoming ' + (upcoming.length === 1 ? 'event' : 'events') + '. Show the QR code at the door.'
+    : 'You have no upcoming events yet.';
+
+  if (!upcoming.length) {
+    $('ticketList').innerHTML = '<div class="empty"><b>No tickets yet</b>Find an event you like and your ticket will appear here.' +
+      '<div style="margin-top:16px"><button class="btn btn-primary btn-inline" data-go="find">Browse events</button></div></div>';
+    return;
+  }
+
+  $('ticketList').innerHTML = upcoming.map(function (t) {
+    var ev = t.ev, r = t.reg, v = F.venue(ev.venue);
+    return '<article class="ticket">' +
+      '<div class="info">' +
+        '<span class="tag tag-live">' + whenText(ev) + '</span>' +
+        '<h3 style="margin-top:10px"><a class="plain" href="event.html?id=' + ev.id + '">' + esc(ev.title) + '</a></h3>' +
+        '<div class="meta">' +
+          '<div><span>Date</span><b>' + F.fmtDate(ev.date, true) + '</b></div>' +
+          '<div><span>Time</span><b>' + F.fmtTime(ev.time) + '</b></div>' +
+          '<div><span>Venue</span><b>' + esc(ev.venue) + '</b></div>' +
+          '<div><span>Go to</span><b>' + esc(ev.room) + '</b></div>' +
+          '<div><span>Food</span><b>' + (ev.catering ? 'Provided' : 'Not provided') + '</b></div>' +
+          '<div><span>Price</span><b>' + F.fmtMoney(F.ticketTotal(ev)) + '</b></div>' +
+        '</div>' +
+        '<div class="btn-row">' +
+          '<a class="btn btn-sm" href="event.html?id=' + ev.id + '">Event details</a>' +
+          '<button class="btn btn-sm" data-cal="' + r.id + '">Add to calendar</button>' +
+          '<a class="btn btn-sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' +
+            encodeURIComponent(v ? v.address : ev.venue + ', Sydney') + '">Directions</a>' +
+          '<button class="btn btn-sm btn-danger" data-cancel="' + r.id + '">Cancel ticket</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="stub">' +
+        '<div class="qr" data-qr="' + esc(r.code) + '"></div>' +
+        '<div class="code">' + esc(r.code) + '</div>' +
+        (r.checkedInAt ? '<span class="tag tag-live">Checked in</span>' : '') +
+      '</div>' +
+    '</article>';
+  }).join('');
+
+  /* Draw QR codes. If the library did not load (offline) the code text still works. */
+  document.querySelectorAll('[data-qr]').forEach(function (el) {
+    if (window.QRCode) new QRCode(el, { text: el.dataset.qr, width: 120, height: 120, correctLevel: QRCode.CorrectLevel.M });
+    else el.remove();
+  });
+};
+
+document.addEventListener('click', function (e) {
+  var c = e.target.closest('[data-cal]');
+  if (!c) return;
+  var reg = F.registrationsForUser(me.id).filter(function (r) { return r.id === c.dataset.cal; })[0];
+  if (reg) F.downloadCalendar(F.getEvent(reg.eventId), reg);
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-cancel]');
+  if (!t) return;
+  var reg = F.registrationsForUser(me.id).filter(function (r) { return r.id === t.dataset.cancel; })[0];
+  var ev = reg && F.getEvent(reg.eventId);
+  if (!ev || !confirm('Cancel your ticket for "' + ev.title + '"? Your seat will be given to someone else.')) return;
+  F.cancelRegistration(reg.id, me.id);
+  refreshCounts();
+  render.tickets();
+  say($('ticketMsg'), 'Your ticket for ' + ev.title + ' has been cancelled.', true);
+});
+
+/* ---------- find events ---------- */
+render.find = function () {
+  var q = $('search').value.trim().toLowerCase();
+  var mine = {};
+  F.registrationsForUser(me.id).forEach(function (r) { mine[r.eventId] = true; });
+
+  var list = F.publicEvents().filter(function (ev) {
+    return !q || (ev.title + ' ' + ev.venue + ' ' + ev.description + ' ' + F.organiserName(ev)).toLowerCase().indexOf(q) !== -1;
+  });
+
+  $('findList').innerHTML = list.map(function (ev) {
+    var left = F.seatsLeft(ev);
+    return '<a class="card ev-card" href="event.html?id=' + ev.id + '">' +
+      '<div class="ev-photo">' + photo(ev.venue) + (mine[ev.id] ? '<span class="tag tag-live going">You are going</span>' : '') + '</div>' +
+      '<div class="ev-body">' +
+        '<span class="date">' + F.fmtDate(ev.date, true) + ' · ' + F.fmtTime(ev.time) + '</span>' +
+        '<h3>' + esc(ev.title) + '</h3>' +
+        '<p>' + esc(ev.venue) + ' · by ' + esc(F.organiserName(ev)) + '</p>' +
+        '<div class="foot"><b class="price">' + F.fmtMoney(F.ticketTotal(ev)) + '</b>' +
+        '<span class="tag ' + (left === 0 ? '' : left < 10 ? 'tag-warn' : 'tag-live') + '">' + (left ? left + ' seats left' : 'Sold out') + '</span></div>' +
+      '</div></a>';
+  }).join('') || '<div class="empty" style="grid-column:1/-1"><b>No events found</b>Try a different search, or check back soon.</div>';
+};
+$('search').addEventListener('input', render.find);
+
+/* ---------- profile and history ---------- */
+render.profile = function () {
+  var all = myTickets();
+  var past = all.filter(function (t) { return F.isPast(t.ev); }).reverse();
+  var attended = past.filter(function (t) { return t.reg.checkedInAt; });
+  var upcoming = all.length - past.length;
+
+  $('pAvatar').textContent = F.initials(me);
+  $('pName').textContent = me.firstName + ' ' + me.lastName;
+  $('pSince').textContent = 'Member since ' + new Date(me.createdAt).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' }) + ' · ' + me.email;
+
+  /* Venues visited = distinct venues of events actually attended. */
+  var places = {};
+  attended.forEach(function (t) {
+    var key = t.ev.venue;
+    places[key] = places[key] || { name: key, count: 0, last: t.ev.date };
+    places[key].count++;
+  });
+  var placeList = Object.keys(places).map(function (k) { return places[k]; });
+
+  $('pStats').innerHTML = [
+    [attended.length, 'Events attended'],
+    [upcoming, 'Upcoming'],
+    [placeList.length, 'Venues visited'],
+    [past.length ? Math.round(attended.length / past.length * 100) + '%' : '—', 'Turned up']
+  ].map(function (s) { return '<div class="card"><div class="n">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>'; }).join('');
+
+  $('pVenues').innerHTML = placeList.map(function (p) {
+    var v = F.venue(p.name);
+    return '<figure class="venue">' + photo(p.name) +
+      '<figcaption><b>' + esc(p.name) + '</b><span>' + (v ? esc(v.address) : '') + '</span>' +
+      '<em>' + p.count + ' ' + (p.count === 1 ? 'visit' : 'visits') + '</em></figcaption></figure>';
+  }).join('') || '<div class="empty" style="grid-column:1/-1"><b>Nowhere yet</b>Venues appear here once you have been checked in at an event.</div>';
+
+  $('pHistory').innerHTML = past.length ? past.map(function (t) {
+    var ev = t.ev, r = t.reg;
+    var rec = /^https?:\/\//.test(ev.recordingUrl || '');
+    return '<div class="hist">' +
+      photo(ev.venue, 'hist-photo') +
+      '<div class="hist-body">' +
+        '<a class="plain" href="event.html?id=' + ev.id + '"><b>' + esc(ev.title) + '</b></a>' +
+        '<span>' + F.fmtDate(ev.date, true) + ' · ' + esc(ev.venue) + '</span>' +
+        '<small>Hosted by ' + esc(F.organiserName(ev)) + '</small>' +
+      '</div>' +
+      '<div class="hist-side">' +
+        (r.checkedInAt
+          ? '<span class="tag tag-live">Attended · ' + new Date(r.checkedInAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' }) + '</span>'
+          : '<span class="tag">Missed</span>') +
+        (rec ? '<a class="btn btn-sm" target="_blank" rel="noopener" href="' + esc(ev.recordingUrl) + '">Watch recording</a>'
+             : '<small class="muted">No recording</small>') +
+      '</div>' +
+    '</div>';
+  }).join('') : '<div class="empty"><b>No past events yet</b>Events you go to will be kept here, with recordings when the organiser shares them.</div>';
+
+  $('pFirst').value = me.firstName;
+  $('pLast').value = me.lastName;
+  $('pPhone').value = me.phone;
+  $('pEmail').value = me.email;
+};
+
+$('profileForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!$('pFirst').value.trim() || !$('pLast').value.trim()) { say($('profileMsg'), 'Please enter your first and last name.'); return; }
+  me = F.updateUser(me.id, { firstName: $('pFirst').value, lastName: $('pLast').value, phone: $('pPhone').value });
+  paintWho();
+  $('pName').textContent = me.firstName + ' ' + me.lastName;
+  $('pAvatar').textContent = F.initials(me);
+  say($('profileMsg'), 'Saved.', true);
+});
+
+function paintWho() {
+  $('whoName').textContent = me.firstName + ' ' + me.lastName;
+  $('avatar').textContent = F.initials(me);
+}
+function refreshCounts() {
+  $('countTickets').textContent = myTickets().filter(function (t) { return !F.isPast(t.ev); }).length;
+}
+
+/* ---------- start ---------- */
+F.requireUser('personal').then(function (user) {
+  me = user;
+  paintWho();
+  refreshCounts();
+  var h = location.hash.slice(1);
+  show(h === 'welcome' ? 'find' : h);
+}).catch(function () {});
+</script>
+
+</body>
+</html>
